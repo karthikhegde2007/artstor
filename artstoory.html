@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ArtStory — The context travels with the art.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Kannada:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{
+  box-sizing:border-box;
+  --bg:#FBF6EC;
+  --bg-raised:#F3EADA;
+  --card:#FFFDF8;
+  --ink:#241608;
+  --ink-soft:#5B4B3A;
+  --maroon:#6E1F23;
+  --maroon-deep:#4B1417;
+  --indigo:#1F2A44;
+  --gold:#B9812E;
+  --gold-bright:#D79A3B;
+  --sandal:#E7D9BE;
+  --line:#DCCBA9;
+  --focus:#1F2A44;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+:root[data-theme="dark"]{
+  --bg:#15100B;
+  --bg-raised:#1D1610;
+  --card:#20180F;
+  --ink:#F3E9D6;
+  --ink-soft:#C7B69A;
+  --maroon:#D9666B;
+  --maroon-deep:#B94B4F;
+  --indigo:#8FA0C9;
+  --gold:#E0A94C;
+  --gold-bright:#F0BD5F;
+  --sandal:#3A2E1E;
+  --line:#3A2E1E;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15100B;--bg-raised:#1D1610;--card:#20180F;--ink:#F3E9D6;--ink-soft:#C7B69A;
+    --maroon:#D9666B;--maroon-deep:#B94B4F;--indigo:#8FA0C9;--gold:#E0A94C;--gold-bright:#F0BD5F;
+    --sandal:#3A2E1E;--line:#3A2E1E;
+  }
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Manrope',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  transition:background .25s ease,color .25s ease;
+  overflow-x:hidden;
+}
+[lang-kn]{font-family:'Noto Sans Kannada','Manrope',sans-serif;}
+[lang-hi]{font-family:'Noto Sans Devanagari','Manrope',sans-serif;}
+h1,h2,h3,.display{font-family:'Fraunces',serif;font-weight:600;letter-spacing:-.01em;color:var(--ink);margin:0;}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+img,svg{max-width:100%}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px;}
+.container-narrow{max-width:760px;margin:0 auto;padding:0 24px;}
+::selection{background:var(--gold);color:#fff}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:4px;}
+
+/* ---- motif ---- */
+.motif-strip{
+  height:10px;width:100%;
+  background-image:repeating-linear-gradient(115deg, var(--gold) 0 2px, transparent 2px 22px);
+  opacity:.55;
+}
+.temple-line{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='40' viewBox='0 0 120 40'%3E%3Cpath d='M0 40 L0 20 Q20 0 40 20 L40 40 M40 40 L40 20 Q60 0 80 20 L80 40 M80 40 L80 20 Q100 0 120 20 L120 40' fill='none' stroke='%23B9812E' stroke-width='1.2' opacity='0.35'/%3E%3C/svg%3E");
+  background-repeat:repeat-x; background-size:120px 40px; height:34px;
+}
+
+/* ---- nav ---- */
+header.topnav{
+  position:sticky; top:0; z-index:40; background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+  padding-top:env(safe-area-inset-top,0px);
+}
+.topnav-inner{display:flex;align-items:center;gap:28px;height:74px;max-width:1180px;margin:0 auto;padding:0 24px;}
+.brand{display:flex;align-items:baseline;gap:10px;flex-shrink:0;}
+.brand .mark{width:30px;height:30px;flex-shrink:0;}
+.brand-name{font-family:'Fraunces',serif;font-weight:700;font-size:22px;letter-spacing:-.02em;}
+.brand-tag{display:none;font-size:12px;color:var(--ink-soft);font-style:italic;}
+@media(min-width:920px){.brand-tag{display:inline}}
+nav.primary-links{display:none;gap:26px;font-size:15px;font-weight:600;}
+@media(min-width:920px){nav.primary-links{display:flex}}
+nav.primary-links a{color:var(--ink-soft);padding:6px 0;border-bottom:2px solid transparent;}
+nav.primary-links a.active,nav.primary-links a:hover{color:var(--ink);border-color:var(--gold);}
+.nav-right{display:flex;align-items:center;gap:10px;margin-left:auto;}
+.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);}
+.db-badge{display:none;}
+@media(min-width:640px){.db-badge{display:inline-flex;}}
+.icon-btn:hover{border-color:var(--gold);}
+select.lang-select{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 10px;font-size:13px;font-weight:600;cursor:pointer;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:999px;font-weight:700;font-size:14.5px;cursor:pointer;border:1px solid transparent;white-space:nowrap;}
+.btn-primary{background:var(--maroon);color:#fff;}
+.btn-primary:hover{background:var(--maroon-deep);}
+.btn-outline{background:transparent;border-color:var(--ink);color:var(--ink);}
+.btn-outline:hover{background:var(--ink);color:var(--bg);}
+.btn-gold{background:var(--gold);color:#241608;}
+.btn-gold:hover{background:var(--gold-bright);}
+.btn-ghost{background:transparent;color:var(--ink-soft);border-color:var(--line);}
+.btn-ghost:hover{color:var(--ink);border-color:var(--gold);}
+.btn-sm{padding:8px 14px;font-size:13px;border-radius:999px;}
+.hamburger{display:flex;}
+@media(min-width:920px){.hamburger{display:none}}
+.mobile-menu{position:fixed;inset:0;background:var(--bg);z-index:60;padding:20px 24px;padding-top:calc(20px + env(safe-area-inset-top,0px));display:none;}
+.mobile-menu.open{display:block;}
+.mobile-menu a{display:block;padding:16px 4px;font-size:20px;font-family:'Fraunces',serif;border-bottom:1px solid var(--line);}
+
+/* ---- hero ---- */
+.hero{position:relative;padding:64px 0 40px;overflow:hidden;}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center;}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:36px;}}
+.eyebrow-tag{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--maroon);font-weight:700;background:color-mix(in srgb, var(--maroon) 10%, transparent);padding:6px 14px;border-radius:999px;margin-bottom:18px;}
+.hero h1{font-size:clamp(34px,5.2vw,58px);line-height:1.06;max-width:14ch;}
+.hero p.sub{font-size:18px;line-height:1.6;color:var(--ink-soft);max-width:46ch;margin:22px 0 30px;}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;}
+.hero-visual{position:relative;aspect-ratio:4/5;border-radius:28px 28px 8px 28px;overflow:hidden;background:linear-gradient(155deg,var(--maroon) 0%, var(--indigo) 60%, #241608 100%);box-shadow:0 30px 60px -25px rgba(36,22,8,.45);}
+.hero-visual .arch{position:absolute;inset:14px;border:1px solid rgba(255,255,255,.22);border-radius:22px 22px 4px 22px;}
+.hero-visual .glyphs{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:28px;}
+.hero-visual .figure{width:60%;opacity:.9;}
+.hero-visual .caption-tag{position:absolute;bottom:20px;left:20px;right:20px;background:rgba(21,16,11,.55);backdrop-filter:blur(6px);border-radius:14px;padding:12px 16px;color:#F3E9D6;font-size:13px;}
+
+/* ---- sections generic ---- */
+section{padding:76px 0;}
+section.raised{background:var(--bg-raised);}
+.section-head{max-width:640px;margin-bottom:44px;}
+.section-head h2{font-size:clamp(26px,3.4vw,38px);line-height:1.15;}
+.section-head p{color:var(--ink-soft);margin-top:14px;font-size:16px;line-height:1.6;}
+
+/* problem compare */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+@media(max-width:800px){.compare-grid{grid-template-columns:1fr;}}
+.compare-col{border-radius:20px;padding:30px 26px;border:1px solid var(--line);}
+.compare-col.without{background:var(--card);}
+.compare-col.with{background:linear-gradient(165deg, color-mix(in srgb, var(--maroon) 8%, var(--card)), var(--card));border-color:var(--gold);}
+.compare-col h3{font-size:15px;text-transform:none;letter-spacing:.01em;color:var(--ink-soft);font-family:'Manrope',sans-serif;font-weight:800;margin-bottom:18px;}
+.compare-col.with h3{color:var(--maroon);}
+.step-row{display:flex;align-items:flex-start;gap:12px;padding:9px 0;font-size:15px;border-bottom:1px dashed var(--line);}
+.step-row:last-child{border-bottom:none;}
+.step-row .ico{flex-shrink:0;width:22px;text-align:center;}
+.compare-arrow{text-align:center;color:var(--ink-soft);font-size:13px;padding:14px 0;}
+
+/* how it works */
+.flow-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;}
+@media(max-width:900px){.flow-steps{grid-template-columns:1fr 1fr;}}
+@media(max-width:560px){.flow-steps{grid-template-columns:1fr;}}
+.flow-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 22px;position:relative;}
+.flow-num{font-family:'Fraunces',serif;font-size:34px;color:var(--gold);font-weight:600;}
+.flow-card h4{font-size:17px;margin:10px 0 8px;font-family:'Manrope',sans-serif;font-weight:800;}
+.flow-card p{font-size:14px;color:var(--ink-soft);line-height:1.55;margin:0;}
+
+/* cards / discover */
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin:26px 0 8px;}
+.chip{padding:8px 15px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:13.5px;font-weight:600;cursor:pointer;color:var(--ink-soft);}
+.chip.active{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+.search-box{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 18px;margin:18px 0;}
+.search-box input{border:none;background:transparent;outline:none;font-size:15px;width:100%;color:var(--ink);font-family:inherit;}
+.cat-row-title{font-family:'Fraunces',serif;font-size:21px;margin:44px 0 18px;}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;}
+.perf-card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer;transition:transform .18s ease, box-shadow .18s ease;}
+.perf-card:hover{transform:translateY(-4px);box-shadow:0 18px 30px -18px rgba(36,22,8,.35);}
+.perf-thumb{aspect-ratio:16/10;position:relative;display:flex;align-items:flex-end;padding:14px;}
+.perf-thumb .play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;color:var(--maroon);font-size:16px;}
+.perf-thumb .form-tag{background:rgba(21,16,11,.6);color:#F3E9D6;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;}
+.perf-body{padding:16px 16px 18px;}
+.perf-body h4{font-family:'Fraunces',serif;font-size:17px;margin-bottom:4px;}
+.perf-meta{font-size:13px;color:var(--ink-soft);margin-bottom:8px;}
+.perf-stats{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--ink-soft);margin-top:10px;}
+.save-toggle{background:none;border:none;cursor:pointer;font-size:16px;color:var(--ink-soft);}
+.save-toggle.saved{color:var(--maroon);}
+
+/* performance detail */
+.perf-hero{padding-top:36px;}
+.video-frame{aspect-ratio:16/9;border-radius:20px;overflow:hidden;position:relative;background:linear-gradient(155deg,var(--indigo),var(--maroon-deep));display:flex;align-items:center;justify-content:center;}
+.video-frame .play-lg{width:74px;height:74px;border-radius:50%;background:rgba(255,255,255,.94);display:flex;align-items:center;justify-content:center;color:var(--maroon);font-size:24px;cursor:pointer;}
+.cc-bar{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(0,0,0,.65),transparent);padding:14px 16px;display:flex;justify-content:space-between;align-items:flex-end;color:#fff;font-size:13px;}
+.cc-controls{display:flex;gap:8px;align-items:center;}
+.cc-controls select,.cc-controls button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:5px 8px;font-size:12px;}
+.cc-caption-text{background:rgba(0,0,0,.55);padding:4px 10px;border-radius:6px;font-size:14px;position:absolute;bottom:56px;left:50%;transform:translateX(-50%);max-width:80%;text-align:center;}
+.perf-title-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:18px;align-items:flex-start;margin-top:26px;}
+.perf-title-row h1{font-size:clamp(26px,3.6vw,38px);}
+.perf-title-row .byline{margin-top:8px;color:var(--ink-soft);font-size:15px;}
+.perf-title-row .byline a{color:var(--maroon);font-weight:700;}
+.tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.tag{background:var(--sandal);color:var(--ink);font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;}
+.action-row{display:flex;gap:10px;flex-wrap:wrap;}
+.action-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:13.5px;font-weight:700;cursor:pointer;color:var(--ink);}
+.action-btn.liked{color:var(--maroon);border-color:var(--maroon);}
+.action-btn.saved{color:var(--gold);border-color:var(--gold);}
+.action-btn.following{color:#fff;background:var(--maroon);border-color:var(--maroon);}
+
+.content-section{max-width:820px;margin:0 auto;padding:40px 24px;border-bottom:1px solid var(--line);}
+.content-section:last-of-type{border-bottom:none;}
+.content-section h2{font-size:22px;display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.content-section .body-text{font-size:16px;line-height:1.75;color:var(--ink-soft);}
+.readmore-btn{background:none;border:none;color:var(--maroon);font-weight:700;cursor:pointer;padding:6px 0;font-size:14px;}
+.char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:6px;}
+.char-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;}
+.char-card .avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(155deg,var(--gold),var(--maroon));margin-bottom:12px;}
+.char-card h4{font-family:'Fraunces',serif;font-size:17px;margin-bottom:6px;}
+.char-card p{font-size:13.5px;color:var(--ink-soft);line-height:1.5;margin:0;}
+.lyrics-tabs{display:flex;gap:8px;margin-bottom:16px;}
+.tab-btn{padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:13.5px;font-weight:700;cursor:pointer;color:var(--ink-soft);}
+.tab-btn.active{background:var(--indigo);color:#fff;border-color:var(--indigo);}
+.lyric-block{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;font-size:15.5px;line-height:1.9;white-space:pre-line;}
+.meaning-note{background:color-mix(in srgb, var(--gold) 14%, transparent);border-left:3px solid var(--gold);padding:14px 16px;border-radius:0 12px 12px 0;font-size:14.5px;color:var(--ink-soft);margin-top:14px;}
+.empty-note{color:var(--ink-soft);font-style:italic;font-size:14.5px;}
+.expand-box{border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden;}
+.expand-head{display:flex;justify-content:space-between;align-items:center;padding:15px 18px;cursor:pointer;font-weight:700;font-size:15px;background:var(--card);}
+.expand-body{padding:0 18px;max-height:0;overflow:hidden;transition:max-height .25s ease;}
+.expand-body.open{padding:0 18px 16px;max-height:400px;}
+.expand-body p{color:var(--ink-soft);font-size:14.5px;line-height:1.65;}
+.gesture-list{display:grid;gap:12px;}
+.gesture-item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+.gesture-item .g-title{font-weight:800;color:var(--maroon);font-size:14.5px;margin-bottom:4px;}
+.gesture-item p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.6;}
+.learn-more-box{background:linear-gradient(155deg,var(--indigo),#241608);border-radius:22px;padding:40px 30px;text-align:center;color:#F3E9D6;margin:40px auto;max-width:820px;}
+.learn-more-box h2{color:#F3E9D6;font-size:26px;}
+.learn-more-box p{color:#D8CDBB;margin:10px 0 22px;}
+
+/* learn page */
+.artform-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px;}
+.artform-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;cursor:pointer;}
+.artform-card .swatch{width:100%;height:70px;border-radius:12px;margin-bottom:14px;}
+.artform-card h4{font-family:'Fraunces',serif;font-size:18px;}
+.artform-card p{font-size:13px;color:var(--ink-soft);margin-top:4px;}
+.learn-detail-grid{display:grid;grid-template-columns:220px 1fr;gap:36px;align-items:start;}
+@media(max-width:760px){.learn-detail-grid{grid-template-columns:1fr;}}
+.learn-nav{display:flex;flex-direction:row;overflow-x:auto;gap:8px;position:static;}
+@media(min-width:760px){.learn-nav{flex-direction:column;position:sticky;top:100px;}}
+.learn-nav button{text-align:left;padding:10px 14px;border-radius:10px;border:none;background:transparent;font-weight:700;color:var(--ink-soft);cursor:pointer;white-space:nowrap;font-size:14.5px;}
+.learn-nav button.active{background:var(--sandal);color:var(--ink);}
+.learn-panel h3{font-size:22px;margin-bottom:14px;}
+.learn-panel p,.learn-panel li{color:var(--ink-soft);font-size:15.5px;line-height:1.75;}
+.learn-panel ul{padding-left:20px;}
+
+/* artist profile */
+.artist-hero{display:flex;gap:24px;align-items:center;flex-wrap:wrap;padding:44px 0 30px;border-bottom:1px solid var(--line);}
+.artist-avatar{width:96px;height:96px;border-radius:50%;background:linear-gradient(155deg,var(--gold),var(--maroon));flex-shrink:0;}
+.artist-hero h1{font-size:30px;}
+.artist-stats{display:flex;gap:22px;margin-top:14px;font-size:14px;color:var(--ink-soft);}
+.artist-stats b{color:var(--ink);font-family:'Fraunces',serif;font-size:16px;}
+.artist-tabs{display:flex;gap:24px;margin:26px 0;border-bottom:1px solid var(--line);}
+.artist-tabs button{background:none;border:none;padding:10px 2px;font-weight:700;color:var(--ink-soft);cursor:pointer;border-bottom:2px solid transparent;font-size:14.5px;}
+.artist-tabs button.active{color:var(--ink);border-color:var(--maroon);}
+
+/* upload flow */
+.stepper{display:flex;gap:10px;margin-bottom:36px;}
+.stepper .dot{flex:1;height:6px;border-radius:99px;background:var(--line);}
+.stepper .dot.done{background:var(--gold);}
+.form-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:32px;}
+.field{margin-bottom:20px;}
+.field label{display:block;font-weight:700;font-size:14px;margin-bottom:8px;}
+.field .helper{font-size:12.5px;color:var(--ink-soft);margin-top:6px;line-height:1.5;}
+.field input,.field select,.field textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:15px;font-family:inherit;}
+.field textarea{min-height:110px;resize:vertical;}
+.dropzone{border:2px dashed var(--line);border-radius:16px;padding:46px 20px;text-align:center;color:var(--ink-soft);cursor:pointer;}
+.dropzone:hover{border-color:var(--gold);}
+.progress-bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:14px;}
+.progress-fill{height:100%;background:var(--gold);transition:width .3s ease;}
+.ai-loading{display:flex;flex-direction:column;align-items:center;padding:80px 20px;text-align:center;}
+.spin-motif{width:64px;height:64px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--maroon);animation:spin 1s linear infinite;margin-bottom:26px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.review-block{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;margin-bottom:20px;}
+.review-block-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.review-block-head h3{font-size:16px;font-family:'Manrope',sans-serif;font-weight:800;}
+.approved-badge{font-size:12px;font-weight:700;color:#3E7A44;background:#3E7A4422;padding:4px 10px;border-radius:999px;}
+.warn-banner{background:color-mix(in srgb, var(--gold) 16%, transparent);border:1px solid var(--gold);border-radius:14px;padding:14px 18px;font-size:14px;margin-bottom:26px;display:flex;gap:10px;align-items:flex-start;}
+
+/* modal / toast */
+.overlay{position:fixed;inset:0;background:rgba(21,16,11,.5);z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal{background:var(--card);border-radius:20px;padding:32px;max-width:420px;width:100%;max-height:88vh;overflow-y:auto;}
+.modal h3{font-size:22px;margin-bottom:6px;}
+.modal .sub{color:var(--ink-soft);font-size:14px;margin-bottom:20px;}
+.role-pick{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.role-pick button{padding:16px 10px;border-radius:14px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-weight:700;font-size:13.5px;}
+.role-pick button.sel{border-color:var(--maroon);background:color-mix(in srgb, var(--maroon) 10%, var(--bg));color:var(--maroon);}
+.close-x{position:absolute;top:16px;right:20px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-soft);}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:13px 22px;border-radius:999px;font-size:14px;font-weight:600;z-index:100;opacity:0;pointer-events:none;transition:all .25s ease;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+footer{border-top:1px solid var(--line);padding:50px 0 34px;margin-top:20px;}
+.footer-grid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px;}
+.footer-tag{color:var(--ink-soft);font-size:14px;max-width:320px;margin-top:8px;}
+.footer-links{display:flex;gap:40px;flex-wrap:wrap;}
+.footer-links h5{font-size:13px;color:var(--ink-soft);margin-bottom:12px;font-weight:800;}
+.footer-links a{display:block;font-size:14px;padding:5px 0;color:var(--ink-soft);}
+.footer-links a:hover{color:var(--ink);}
+.footer-bottom{margin-top:36px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-soft);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+
+.admin-table{width:100%;border-collapse:collapse;font-size:14px;}
+.admin-table th{text-align:left;padding:10px 12px;color:var(--ink-soft);font-size:12.5px;border-bottom:1px solid var(--line);}
+.admin-table td{padding:12px;border-bottom:1px solid var(--line);}
+.status-pill{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;}
+.status-pill.Published{background:#3E7A4422;color:#3E7A44;}
+.status-pill.NeedsReview,.status-pill.AIProcessing{background:#B9812E22;color:#B9812E;}
+.status-pill.Draft{background:#66666622;color:#666;}
+
+.final-cta{text-align:center;padding:90px 0;}
+.final-cta h2{font-size:clamp(28px,4vw,42px);max-width:14ch;margin:0 auto 10px;}
+.final-cta .ctas{display:flex;gap:14px;justify-content:center;margin-top:26px;flex-wrap:wrap;}
+
+.pillars-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+@media(max-width:900px){.pillars-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:520px){.pillars-grid{grid-template-columns:1fr;}}
+.pillar{padding:24px;border-radius:18px;background:var(--card);border:1px solid var(--line);}
+.pillar .emoji{font-size:26px;}
+.pillar h4{margin:10px 0 6px;font-size:16px;font-family:'Manrope',sans-serif;font-weight:800;}
+.pillar p{font-size:13.5px;color:var(--ink-soft);margin:0;line-height:1.55;}
+
+.breadcrumb{font-size:13.5px;color:var(--ink-soft);margin-bottom:18px;}
+.breadcrumb a{color:var(--maroon);font-weight:700;}
+.report-reasons label{display:flex;gap:10px;align-items:center;padding:10px 0;font-size:14.5px;border-bottom:1px solid var(--line);cursor:pointer;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+@media(max-width:800px){.two-col{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+
+<script>
+/* =========================================================
+   ArtStory — demo full-stack prototype
+   All "AI" generation is a transparent template-based mock,
+   clearly labelled, per the product's demo-mode requirement.
+
+   DATABASE (real, shared, cross-device):
+   Paste your Supabase project URL + anon key below and run the
+   SQL in setup-database.sql (see the downloaded files). Until
+   you do, the app runs fully functional in "local demo mode" —
+   everything works, but data only lives in this one browser.
+   ========================================================= */
+const SUPABASE_URL = "";       // e.g. "https://xxxxxxxx.supabase.co"
+const SUPABASE_ANON_KEY = "";  // your project's anon/public key
+let sb = null;
+let dbConnected = false;
+try{
+  if(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase && window.supabase.createClient){
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    dbConnected = true;
+  }
+}catch(e){ console.warn("Supabase init failed, running in local demo mode.", e); sb=null; dbConnected=false; }
+
+function rowToPerf(r){
+  return { slug:r.id, title:r.title, artForm:r.art_form, language:r.language, region:r.region,
+    artistId:r.artist_id, characters:r.characters||[], plot:r.plot, story:r.story,
+    culturalNote:r.cultural_note, charDesc:r.char_desc||{}, lyrics:r.lyrics||{original:null,translations:{},meaning:null},
+    captions:r.captions||[], gestures:r.gestures||[], likes:r.likes||0, views:r.views||0, status:r.status||"Published" };
+}
+function perfToRow(p){
+  return { id:p.slug, title:p.title, art_form:p.artForm, language:p.language, region:p.region,
+    artist_id:p.artistId, characters:p.characters, plot:p.plot, story:p.story,
+    cultural_note:p.culturalNote, char_desc:p.charDesc, lyrics:p.lyrics, captions:p.captions,
+    gestures:p.gestures, likes:p.likes, views:p.views, status:p.status };
+}
+async function loadPerformances(){
+  if(!sb){ return; } // local demo data already in state.performances
+  try{
+    const { data, error } = await sb.from("performances").select("*").order("created_at",{ascending:false});
+    if(error) throw error;
+    if(!data || data.length===0){
+      // first run on a fresh database — seed it with the demo performances
+      const seedRows = DEMO_PERFORMANCES.map(p=>({...perfToRow(p), created_at:new Date().toISOString()}));
+      const { error: seedErr } = await sb.from("performances").insert(seedRows);
+      if(seedErr) throw seedErr;
+      state.performances = JSON.parse(JSON.stringify(DEMO_PERFORMANCES));
+    } else {
+      state.performances = data.map(rowToPerf);
+    }
+  }catch(e){
+    console.warn("Supabase load failed, falling back to local demo data.", e);
+    dbConnected = false;
+  }
+}
+
+/* ---------- i18n ---------- */
+const STR = {
+  en:{discover:"Discover",performances:"Performances",learn:"Learn",artists:"Artists",about:"About",upload:"Upload Performance",
+    tagline:"The context travels with the art.",heroH1:"Don't just watch the art. Understand the story behind it.",
+    heroSub:"Traditional performances carry stories, emotions, music and cultural meaning. ArtStory brings that context alongside the performance so anyone can discover and understand it.",
+    exploreBtn:"Explore Performances",uploadBtn:"Upload Your Art",login:"Log in",logout:"Log out",searchPh:"Search artists, art forms, stories or performances…"},
+  kn:{discover:"ಅನ್ವೇಷಿಸಿ",performances:"ಪ್ರದರ್ಶನಗಳು",learn:"ಕಲಿಯಿರಿ",artists:"ಕಲಾವಿದರು",about:"ನಮ್ಮ ಬಗ್ಗೆ",upload:"ಪ್ರದರ್ಶನ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ",
+    tagline:"ಕಲೆಯೊಂದಿಗೆ ಸಂದರ್ಭವೂ ಪ್ರಯಾಣಿಸುತ್ತದೆ.",heroH1:"ಕಲೆಯನ್ನು ನೋಡುವುದಷ್ಟೇ ಅಲ್ಲ. ಅದರ ಹಿಂದಿನ ಕಥೆಯನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.",
+    heroSub:"ಸಾಂಪ್ರದಾಯಿಕ ಪ್ರದರ್ಶನಗಳು ಕಥೆಗಳು, ಭಾವನೆಗಳು, ಸಂಗೀತ ಮತ್ತು ಸಾಂಸ್ಕೃತಿಕ ಅರ್ಥವನ್ನು ಹೊಂದಿರುತ್ತವೆ. ArtStory ಆ ಸಂದರ್ಭವನ್ನು ಪ್ರದರ್ಶನದ ಜೊತೆಗೇ ತರುತ್ತದೆ.",
+    exploreBtn:"ಪ್ರದರ್ಶನಗಳನ್ನು ಅನ್ವೇಷಿಸಿ",uploadBtn:"ನಿಮ್ಮ ಕಲೆಯನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ",login:"ಲಾಗಿನ್",logout:"ಲಾಗ್ಔಟ್",searchPh:"ಕಲಾವಿದರು, ಕಲಾ ಪ್ರಕಾರಗಳು, ಕಥೆಗಳನ್ನು ಹುಡುಕಿ…"},
+  hi:{discover:"खोजें",performances:"प्रस्तुतियाँ",learn:"सीखें",artists:"कलाकार",about:"परिचय",upload:"प्रस्तुति अपलोड करें",
+    tagline:"संदर्भ कला के साथ यात्रा करता है।",heroH1:"कला को सिर्फ़ देखें नहीं। उसके पीछे की कहानी समझें।",
+    heroSub:"पारंपरिक प्रस्तुतियाँ कहानियाँ, भावनाएँ, संगीत और सांस्कृतिक अर्थ लेकर चलती हैं। ArtStory उस संदर्भ को प्रस्तुति के साथ ही सामने लाता है।",
+    exploreBtn:"प्रस्तुतियाँ देखें",uploadBtn:"अपनी कला अपलोड करें",login:"लॉग इन",logout:"लॉग आउट",searchPh:"कलाकार, कला रूप या कहानियाँ खोजें…"}
+};
+function t(k){ return (STR[state.lang]&&STR[state.lang][k]) || STR.en[k]; }
+
+/* ---------- demo data ---------- */
+const ART_FORMS = {
+  yakshagana:{name:"Yakshagana",region:"Coastal Karnataka",language:"Kannada",swatch:"linear-gradient(155deg,#6E1F23,#B9812E)",
+    history:"Yakshagana is a traditional theatre form from coastal Karnataka that combines dance, music, dialogue, costume and elaborate makeup to enact stories from the Puranas and epics, typically performed through the night.",
+    costumes:"Performers wear tall crowns (kirita), layered skirts and heavy ornaments. Colour and headgear design help the audience identify whether a character is divine, heroic or demonic.",
+    music:"A Bhagavata (narrator-singer) leads the performance with a harmonium and chende (drum), singing verses that the actors then interpret through dance and dialogue.",
+    expressions:["Anger (Raudra) — wide eyes and a sharp raised brow, often used for antagonist characters like Kamsa or Ravana.","Valor (Veera) — a wide, grounded stance and forward stride used to portray heroic characters."],
+    mudras:["Pataka — a flat open palm, used to indicate action, blessing or direction.","Mushti — a closed fist, used to depict strength, holding an object, or resolve."],
+    terminology:["Bhagavata — the narrator-vocalist who leads the performance and sings the story.","Chende — the primary drum accompanying most Yakshagana performances.","Himmela — the group of musicians accompanying the performers."],
+    structure:"A performance typically opens with an invocation (Poorvaranga), followed by the entry of characters (Vesha), and builds through dialogue-driven scenes (Arthadhari) toward a climactic confrontation."},
+  bharatanatyam:{name:"Bharatanatyam",region:"Tamil Nadu",language:"Tamil",swatch:"linear-gradient(155deg,#1F2A44,#B9812E)",
+    history:"Bharatanatyam is one of the oldest classical dance forms of India, rooted in the temples of Tamil Nadu and codified through the Natya Shastra, expressing devotion and storytelling through precise geometry of movement.",
+    costumes:"Dancers wear a pleated fan-like costume that opens dramatically during certain postures, along with temple jewellery and ankle bells (ghungroo) that mark rhythm.",
+    music:"Performed to Carnatic music, typically featuring a vocalist, mridangam, violin and nattuvangam (rhythmic syllables spoken by the conductor).",
+    expressions:["Shringara (love/devotion) — soft gaze and gentle hand movement, often used in compositions addressed to a deity.","Bhakti — folded palms and an inward gaze expressing surrender and devotion."],
+    mudras:["Pataka — flat palm, used for elements like a flag, forest, or river.","Alapadma — a fully bloomed open palm, used to depict a lotus or beauty."],
+    terminology:["Adavu — the basic units of movement that compose a dance sequence.","Nattuvangam — the rhythmic cymbal-and-recitation system that conducts the dancer's tempo."],
+    structure:"A traditional recital (margam) moves from a devotional invocation (Alarippu) through pure-dance items to expressive storytelling pieces (Varnam) and closes with a lighter composition (Tillana)."},
+  kathak:{name:"Kathak",region:"North India",language:"Hindi/Urdu",swatch:"linear-gradient(155deg,#6E1F23,#1F2A44)",
+    history:"Kathak developed from storytelling traditions of North Indian temples and later flourished in royal courts, blending fast rhythmic footwork with graceful, spinning movement.",
+    costumes:"Costumes range from traditional Hindu-style skirts and cholis to Mughal-court-influenced angarkha and churidar styles, reflecting the dance's dual temple and court heritage.",
+    music:"Accompanied by tabla, sarangi or harmonium, with the dancer often engaging in a rhythmic dialogue (sawal-jawab) with the percussionist.",
+    expressions:["Prem (love) — soft eye movement and a gentle smile used in romantic storytelling episodes.","Chakkar spins — rapid rotations that build rhythmic intensity, often at the climax of a piece."],
+    mudras:["Pataka — flat palm, frequently used for narrative gestures.","Hamsasya — thumb and forefinger joined, used for delicate or precise actions."],
+    terminology:["Tatkar — the rhythmic footwork vocabulary central to Kathak.","Tukra — a short rhythmic composition performed within a piece."],
+    structure:"A recital typically alternates between rhythmic footwork sequences set to tabla compositions and expressive storytelling (abhinaya) passages performed to sung verses."},
+  kuchipudi:{name:"Kuchipudi",region:"Andhra Pradesh",language:"Telugu",swatch:"linear-gradient(155deg,#B9812E,#4B1417)",
+    history:"Kuchipudi originated as a dance-drama tradition in Andhra Pradesh, historically performed by touring troupes enacting mythological stories with dialogue, song and dance combined.",
+    costumes:"Dancers wear brightly coloured silk sarees draped in a distinctive style, along with temple jewellery; some pieces are performed while balanced on the rim of a brass plate.",
+    music:"Set to Carnatic music, often featuring extended sung narrative passages (sabdam) that the dancer enacts through expression and gesture.",
+    expressions:["Playfulness — used in pieces depicting Krishna's childhood exploits.","Devotion — inward gaze and folded gesture used in prayer sequences."],
+    mudras:["Kartarimukha — a scissor-like hand shape, used to depict cutting, separation or opposition.","Tripataka — three raised fingers, used for a crown, tree, or arrow."],
+    terminology:["Sabdam — a sung narrative composition central to Kuchipudi repertoire.","Tarangam — a piece traditionally performed standing on a brass plate."],
+    structure:"Performances often begin with an invocation to Ganesha, move through narrative dance-drama sequences, and may include a plate-dance item as a technical highlight."},
+  kathakali:{name:"Kathakali",region:"Kerala",language:"Malayalam",swatch:"linear-gradient(155deg,#4B1417,#1F2A44)",
+    history:"Kathakali is a highly stylised dance-drama from Kerala known for elaborate makeup and costume that transform performers into larger-than-life mythological characters.",
+    costumes:"Performers wear extensive facial makeup (chutti) using colour codes — green for noble characters, red-and-white beard for aggressive ones — along with wide skirts and ornate headgear.",
+    music:"Accompanied by chenda and maddalam drums along with vocalists who sing the narrative text (padam) that performers enact entirely through gesture and expression.",
+    expressions:["Krodha (anger) — a hallmark Kathakali expression using eye and eyebrow control, often held for extended, dramatic duration.","Karuna (compassion) — a softened gaze used in tender scenes."],
+    mudras:["Kathakali uses an elaborate hand-gesture language (Mudra) derived from the Hastalakshana Deepika, capable of conveying full sentences.","Mukula — fingertips joined, used to depict a bud, or offering."],
+    terminology:["Chutti — the distinctive white facial border built up with rice paste.","Padam — the sung narrative verses performers enact on stage."],
+    structure:"A performance opens with a curtain-look sequence introducing key characters, followed by extended enacted scenes driven by sung narration and gesture."},
+  odissi:{name:"Odissi",region:"Odisha",language:"Odia",swatch:"linear-gradient(155deg,#1F2A44,#6E1F23)",
+    history:"Odissi is a classical dance form from Odisha closely associated with temple sculpture, known for its sculpturesque poses and fluid torso movement (tribhangi).",
+    costumes:"Dancers wear silver filigree jewellery and sambalpuri silk costumes, with a distinctive silver headpiece tracing back to temple iconography.",
+    music:"Performed to Odissi music, a distinct classical tradition, often accompanied by pakhawaj, flute and vocal recitation.",
+    expressions:["Bhakti — devotional pieces often performed to compositions describing Jagannath or Krishna.","Sringara — romantic expression frequently drawn from Gita Govinda verses."],
+    mudras:["Tribhangi — the signature three-bend body posture rather than a hand mudra, core to Odissi's visual identity.","Pataka — flat palm, used broadly across narrative sequences."],
+    terminology:["Bhangi — the sculptural body postures characteristic of Odissi.","Mangalacharan — the invocatory opening item of a recital."],
+    structure:"A recital typically opens with Mangalacharan, moves through pure-dance items (Pallavi) and closes with expressive storytelling (Abhinaya)."}
+};
+
+const ARTISTS = {
+  "ravindra-shetty":{name:"Ravindra Shetty",artForm:"Yakshagana",region:"Udupi, Karnataka",languages:["Kannada","English"],
+    bio:"A third-generation Yakshagana artist trained in the Tenkutittu style, performing across coastal Karnataka for over 18 years and known for his portrayal of raudra (fury) roles.",
+    years:18, followers:284},
+  "meenakshi-iyer":{name:"Meenakshi Iyer",artForm:"Bharatanatyam",region:"Chennai, Tamil Nadu",languages:["Tamil","English"],
+    bio:"A senior Bharatanatyam dancer trained under the Kalakshetra tradition, performing and teaching in Chennai for over 22 years.",
+    years:22, followers:0},
+  "ananya-verma":{name:"Ananya Verma",artForm:"Kathak",region:"Lucknow, Uttar Pradesh",languages:["Hindi","English"],
+    bio:"A Kathak performer of the Lucknow gharana, known for blending rhythmic footwork with expressive storytelling drawn from Krishna Leela themes.",
+    years:12, followers:0}
+};
+// fix malformed follower typo defensively
+Object.values(ARTISTS).forEach(a=>{ if(typeof a.followers!=="number") a.followers = 180; });
+
+const DEMO_PERFORMANCES = [
+  {slug:"krishna-vs-kamsa",title:"Krishna vs Kamsa",artForm:"yakshagana",language:"Kannada",region:"Coastal Karnataka",
+    artistId:"ravindra-shetty",characters:["Krishna","Kamsa"],
+    plot:"Krishna goes to Mathura and defeats Kamsa.",
+    story:"This performance depicts the confrontation between Krishna and Kamsa. As foretold by prophecy, Krishna travels to Mathura, where Kamsa has long ruled through fear. The performance builds through Kamsa's growing dread and Krishna's calm resolve, culminating in a climactic confrontation in which Krishna fulfils the prophecy of Kamsa's downfall.",
+    culturalNote:"Performed in the Tenkutittu style of Yakshagana, this piece draws from the Bhagavata Purana's account of Krishna's early life and is a staple of the coastal Karnataka performance calendar during festival season.",
+    charDesc:{Krishna:"The protagonist of the tale — portrayed with calm, composed movement (Sattvika) that contrasts with Kamsa's volatility, reflecting his role as the prophesied deliverer.",
+      Kamsa:"The tyrant king of Mathura, portrayed through the Raudra (fury) mode — wide eyes, sharp brow movement and a heavy, ornamented headdress signal his volatile, antagonistic role."},
+    lyrics:{original:"ಮಥುರೆಗೆ ಬಂದನು ಕೃಷ್ಣ ಕಂಸನ ಗರ್ವವ ಮುರಿಯಲು...\n(traditional Yakshagana padya, coastal Karnataka)",
+      translations:{en:"Krishna arrived in Mathura to break Kamsa's pride...",hi:"कृष्ण मथुरा आए कंस के अभिमान को तोड़ने..."},
+      meaning:"This verse sets up the moral arc of the performance: pride and tyranny (Kamsa) meeting their inevitable end against righteousness (Krishna). The meaning here reflects the performance's traditional interpretation, distinct from a literal word-for-word translation."},
+    captions:[{t:0,text:"[Bhagavata narration begins]"},{t:8,text:"Krishna approaches Mathura"},{t:19,text:"Kamsa senses the prophecy nearing"},{t:30,text:"The confrontation begins"}],
+    gestures:[{title:"Gesture: Mushti (closed fist)",body:"In this performance, Kamsa uses the Mushti gesture during his opening monologue to represent his tightened grip on power and mounting anger."},
+      {title:"Expression: Raudra (fury)",body:"In this performance, this expression is used to represent Kamsa's rage upon hearing of the prophecy — it is specific to this antagonist's portrayal, not a universal meaning of the expression."}],
+    likes:412, saved:0, views:9820, status:"Published"},
+  {slug:"krishna-leela",title:"Krishna Leela",artForm:"bharatanatyam",language:"Tamil",region:"Tamil Nadu",
+    artistId:"meenakshi-iyer",characters:["Krishna","Yashoda"],
+    plot:"A depiction of young Krishna's childhood mischief in Vrindavan and his mother Yashoda's affection for him.",
+    story:"This performance brings alive Krishna's childhood in Vrindavan — his playful mischief among the gopis, his fondness for butter, and the deep, patient affection of his mother Yashoda, who alternates between exasperation and boundless love.",
+    culturalNote:"Set to a traditional Tamil composition (Sabdam-style), this piece is part of the classical Bharatanatyam margam repertoire depicting the Bhakti tradition's devotion to Krishna's childhood form (Bala Krishna).",
+    charDesc:{Krishna:"Portrayed through playful, quick movement and a mischievous half-smile, reflecting his childhood exploits.",
+      Yashoda:"Portrayed through gentle, flowing gesture and a soft gaze, expressing maternal love (Vatsalya Bhakti)."},
+    lyrics:{original:"ஆடி வா என் கண்ணா, வெண்ணெய் திருடிய கள்ளா...\n(traditional Tamil composition)",
+      translations:{en:"Come dance, my Kanna, you little thief of butter...",hi:"नाचो मेरे कान्हा, माखन चुराने वाले चोर..."},
+      meaning:"The verse affectionately scolds Krishna as a 'butter thief' — a well-known motif expressing that even his mischief is a form of endearment, central to Vatsalya (parental) devotion in Bhakti tradition."},
+    captions:[{t:0,text:"[Nattuvangam recitation begins]"},{t:10,text:"Krishna sneaks toward the butter pot"},{t:22,text:"Yashoda discovers him"},{t:33,text:"A tender embrace closes the scene"}],
+    gestures:[{title:"Mudra: Alapadma",body:"In this performance, the Alapadma (open lotus palm) is used to depict the butter pot and later, blossoming affection."},
+      {title:"Expression: Vatsalya (parental love)",body:"In this performance, this expression is used specifically to portray Yashoda's affection — it is one of several possible uses of this expression across Bharatanatyam repertoire."}],
+    likes:288, saved:0, views:5310, status:"Published"},
+  {slug:"radha-krishna",title:"Radha Krishna",artForm:"kathak",language:"Hindi",region:"North India",
+    artistId:"ananya-verma",characters:["Radha","Krishna"],
+    plot:"A depiction of the divine love between Radha and Krishna, expressed through rhythmic footwork and storytelling.",
+    story:"This performance portrays the longing and eventual reunion of Radha and Krishna — a central theme in North Indian devotional storytelling — expressed through the rhythmic vocabulary of Kathak, alternating between fast footwork sequences and slower, expressive passages.",
+    culturalNote:"Drawing on themes popularised by poets such as Jayadeva and later Riti-era poetry, this piece belongs to the Kathak tradition's long history of court and temple storytelling around Radha-Krishna devotion.",
+    charDesc:{Radha:"Portrayed through soft, searching gaze and delicate hand gesture, expressing longing (Viraha).",
+      Krishna:"Portrayed through playful footwork and a teasing demeanour, reflecting his role as the beloved."},
+    lyrics:{original:null, translations:{}, meaning:null},
+    captions:[{t:0,text:"[Tabla composition begins]"},{t:12,text:"Radha's solo — expressing longing"},{t:26,text:"Krishna enters with rhythmic footwork"},{t:40,text:"Reunion sequence"}],
+    gestures:[{title:"Footwork: Tatkar",body:"In this performance, rapid Tatkar footwork is used to build rhythmic tension ahead of the reunion sequence."},
+      {title:"Expression: Viraha (longing)",body:"In this performance, this expression is used to portray Radha's separation from Krishna before their reunion."}],
+    likes:196, saved:0, views:3420, status:"Published"}
+];
+
+/* ---------- state ---------- */
+let state = {
+  theme: localStorage.getItem("as_theme") || "auto",
+  lang: localStorage.getItem("as_lang") || "en",
+  user: JSON.parse(localStorage.getItem("as_user")||"null"),
+  performances: JSON.parse(localStorage.getItem("as_performances")||"null") || JSON.parse(JSON.stringify(DEMO_PERFORMANCES)),
+  liked: JSON.parse(localStorage.getItem("as_liked")||"[]"),
+  saved: JSON.parse(localStorage.getItem("as_saved")||"[]"),
+  following: JSON.parse(localStorage.getItem("as_following")||"[]"),
+  draft: null,
+  filters:{ artForm:"all", q:"" },
+  ui:{ mobileMenu:false, authModal:false, authRole:null, authMode:"login", reportModal:null, expandedStory:false, lyricsTab:"original", ccOn:false, ccLang:"original", learnTab:"history", artistTab:"performances" }
+};
+function persist(){
+  localStorage.setItem("as_theme", state.theme);
+  localStorage.setItem("as_lang", state.lang);
+  localStorage.setItem("as_user", JSON.stringify(state.user));
+  localStorage.setItem("as_performances", JSON.stringify(state.performances));
+  localStorage.setItem("as_liked", JSON.stringify(state.liked));
+  localStorage.setItem("as_saved", JSON.stringify(state.saved));
+  localStorage.setItem("as_following", JSON.stringify(state.following));
+}
+function applyTheme(){
+  const root=document.documentElement;
+  if(state.theme==="auto") root.removeAttribute("data-theme");
+  else root.setAttribute("data-theme", state.theme);
+}
+function toast(msg){
+  const el=document.getElementById("toast");
+  el.textContent=msg; el.classList.add("show");
+  clearTimeout(window.__toastT);
+  window.__toastT=setTimeout(()=>el.classList.remove("show"),2200);
+}
+function slugify(s){ return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"")+"-"+Math.random().toString(36).slice(2,6); }
+function findPerf(slug){ return state.performances.find(p=>p.slug===slug); }
+function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+/* ---------- router ---------- */
+function route(){
+  const hash = location.hash.replace(/^#\/?/, "");
+  const [path, ...rest] = hash.split("/");
+  let html = "";
+  window.scrollTo(0,0);
+  switch(path){
+    case "": case "home": html = renderLanding(); break;
+    case "discover": html = renderDiscover(); break;
+    case "performance": html = renderPerformanceDetail(decodeURIComponent(rest.join("/"))); break;
+    case "learn": html = renderLearn(rest[0]); break;
+    case "artist": html = renderArtistProfile(rest[0]); break;
+    case "upload": html = renderUpload(); break;
+    case "review": html = renderReview(); break;
+    case "about": html = renderAbout(); break;
+    case "admin": html = renderAdmin(); break;
+    default: html = renderLanding();
+  }
+  document.getElementById("app").innerHTML = renderNav() + html + renderFooter() + renderModals();
+  bindGlobalEvents();
+  document.body.setAttribute("lang-"+ (state.lang==="kn"?"kn":state.lang==="hi"?"hi":"en"), state.lang!=="en" ? "true" : null);
+}
+window.addEventListener("hashchange", route);
+
+/* ---------- nav ---------- */
+function navLink(hrefPath, label){
+  const active = location.hash.replace(/^#\/?/,"").split("/")[0] === hrefPath ? "active":"";
+  return `<a href="#/${hrefPath}" class="${active}">${label}</a>`;
+}
+function renderNav(){
+  const u = state.user;
+  return `
+  <header class="topnav">
+    <div class="topnav-inner">
+      <a href="#/" class="brand" aria-label="ArtStory home">
+        <svg class="mark" viewBox="0 0 30 30"><path d="M15 2 L27 15 L15 28 L3 15 Z" fill="none" stroke="var(--gold)" stroke-width="1.6"/><circle cx="15" cy="15" r="5.4" fill="var(--maroon)"/></svg>
+        <span class="brand-name">ArtStory</span>
+        <span class="brand-tag">${t("tagline")}</span>
+      </a>
+      <nav class="primary-links">
+        ${navLink("discover", t("discover"))}
+        ${navLink("discover", t("performances"))}
+        ${navLink("learn", t("learn"))}
+        ${navLink("about", t("about"))}
+      </nav>
+      <div class="nav-right">
+        <select class="lang-select" id="langSelect" aria-label="Language">
+          <option value="en" ${state.lang==="en"?"selected":""}>EN</option>
+          <option value="kn" ${state.lang==="kn"?"selected":""}>ಕನ್ನಡ</option>
+          <option value="hi" ${state.lang==="hi"?"selected":""}>हिंदी</option>
+        </select>
+        <button class="icon-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle dark mode">${state.theme==="dark"?"☀️":"🌙"}</button>
+        <span title="${dbConnected?'Connected to your Supabase database — data is shared and persists for every visitor.':'Local demo mode — data only lives in this browser. Add your Supabase keys to go live.'}" class="db-badge" style="font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;align-items:center;gap:5px;white-space:nowrap;${dbConnected?'background:#3E7A4422;color:#3E7A44;':'background:#B9812E22;color:#B9812E;'}">${dbConnected?'🟢 Synced':'⚪ Local demo'}</span>
+        <a href="#/discover" class="icon-btn" title="Search" aria-label="Search">🔎</a>
+        ${u ? `<a href="#/artist/${u.role==='artist' && u.artistId ? u.artistId : ''}" class="icon-btn" title="Profile" aria-label="Profile">👤</a>` : `<button class="icon-btn" id="openAuth" title="Log in" aria-label="Log in">👤</button>`}
+        <a href="#/upload" class="btn btn-primary" style="display:none" id="uploadCtaDesktop">${t("upload")}</a>
+        <button class="icon-btn hamburger" id="hamburgerBtn" aria-label="Menu">☰</button>
+      </div>
+    </div>
+  </header>
+  <div class="mobile-menu ${state.ui.mobileMenu?'open':''}" id="mobileMenu">
+    <button class="close-x" id="closeMobileMenu" style="position:static;float:right;">✕</button>
+    <a href="#/discover">${t("discover")}</a>
+    <a href="#/learn">${t("learn")}</a>
+    <a href="#/about">${t("about")}</a>
+    <a href="#/upload">${t("upload")}</a>
+  </div>`;
+}
+document.addEventListener("DOMContentLoaded", ()=>{ // show upload CTA if room (kept simple always visible on >=1180)
+});
+
+/* ---------- LANDING ---------- */
+function renderLanding(){
+  return `
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow-tag">What is Earth without art? Just a rock.</span>
+        <h1>${t("heroH1")}</h1>
+        <p class="sub">${t("heroSub")}</p>
+        <div class="hero-ctas">
+          <a href="#/discover" class="btn btn-primary">${t("exploreBtn")}</a>
+          <a href="#/upload" class="btn btn-outline">${t("uploadBtn")}</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="arch"></div>
+        <div class="glyphs">
+          <svg class="figure" viewBox="0 0 200 220" fill="none">
+            <path d="M100 20 C60 40 60 90 100 100 C140 90 140 40 100 20 Z" fill="#D79A3B" opacity=".85"/>
+            <path d="M40 210 C40 140 70 110 100 110 C130 110 160 140 160 210" stroke="#F3E9D6" stroke-width="3" fill="none" opacity=".7"/>
+            <circle cx="70" cy="60" r="5" fill="#F3E9D6"/><circle cx="130" cy="60" r="5" fill="#F3E9D6"/>
+          </svg>
+        </div>
+        <div class="caption-tag">📖 Krishna vs Kamsa · Yakshagana · Kannada</div>
+      </div>
+    </div>
+    <div class="motif-strip" style="margin-top:60px"></div>
+  </section>
+
+  <section class="raised">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Beautiful art shouldn't be difficult to understand.</h2>
+        <p>Most audiences leave a performance with a feeling, but without the context. ArtStory keeps the two together.</p>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-col without">
+          <h3>Without context</h3>
+          <div class="step-row"><span class="ico">🎥</span> Watch the performance</div>
+          <div class="step-row"><span class="ico">❓</span> Who is this character?</div>
+          <div class="step-row"><span class="ico">❓</span> What is happening right now?</div>
+          <div class="step-row"><span class="ico">❓</span> What does this gesture mean?</div>
+          <div class="step-row"><span class="ico">❓</span> What is the song saying?</div>
+          <div class="compare-arrow">↓ leave the platform and search elsewhere</div>
+        </div>
+        <div class="compare-col with">
+          <h3>With ArtStory</h3>
+          <div class="step-row"><span class="ico">🎥</span> Watch</div>
+          <div class="step-row"><span class="ico">📖</span> Read the story</div>
+          <div class="step-row"><span class="ico">👤</span> Meet the characters</div>
+          <div class="step-row"><span class="ico">🎵</span> Understand the music &amp; meaning</div>
+          <div class="step-row"><span class="ico">🪔</span> Explore cultural context</div>
+          <div class="compare-arrow">↓ understand the performance, in place</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <h2>How it works</h2>
+        <p>Artists stay in control of their story at every step — AI only helps organise it.</p>
+      </div>
+      <div class="flow-steps">
+        <div class="flow-card"><div class="flow-num">01</div><h4>Artist uploads</h4><p>The artist shares the performance and a short, plain-language plot — no long write-up required.</p></div>
+        <div class="flow-card"><div class="flow-num">02</div><h4>AI assists</h4><p>AI drafts a structured story, character notes, translation and captions from what the artist provided.</p></div>
+        <div class="flow-card"><div class="flow-num">03</div><h4>Artist verifies</h4><p>The artist reviews, edits and approves every AI-drafted section before anything goes public.</p></div>
+        <div class="flow-card"><div class="flow-num">04</div><h4>Audience understands</h4><p>People watch the performance with its story and cultural context sitting right alongside it.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="raised">
+    <div class="wrap" style="text-align:center">
+      <div class="section-head" style="margin:0 auto 30px;">
+        <h2>Every performance has a story.</h2>
+        <p>Help the world understand it.</p>
+      </div>
+      <div class="hero-ctas" style="justify-content:center">
+        <a href="#/discover" class="btn btn-primary">Explore Art</a>
+        <a href="#/upload" class="btn btn-outline">Share Your Art</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="pillars-grid">
+        <div class="pillar"><div class="emoji">🎨</div><h4>Discover</h4><p>Help audiences discover lesser-known artists and traditions.</p></div>
+        <div class="pillar"><div class="emoji">🪔</div><h4>Preserve</h4><p>Preserve performances together with their cultural context.</p></div>
+        <div class="pillar"><div class="emoji">🤝</div><h4>Connect</h4><p>Create a direct path between artists and interested audiences.</p></div>
+        <div class="pillar"><div class="emoji">💻</div><h4>Reimagine</h4><p>A new way to experience traditional art, built for the web.</p></div>
+      </div>
+    </div>
+  </section>`;
+}
+
+/* ---------- DISCOVER ---------- */
+function renderDiscover(){
+  const forms = ["all", ...new Set(state.performances.map(p=>p.artForm))];
+  let list = state.performances.filter(p=>p.status==="Published");
+  if(state.filters.artForm!=="all") list = list.filter(p=>p.artForm===state.filters.artForm);
+  if(state.filters.q) list = list.filter(p => (p.title+p.artForm+p.language+p.characters.join(" ")+(ARTISTS[p.artistId]?.name||"")).toLowerCase().includes(state.filters.q.toLowerCase()));
+  return `
+  <section style="padding-top:44px">
+    <div class="wrap">
+      <h1 style="font-size:clamp(28px,4vw,42px)">Discover Traditional Art</h1>
+      <div class="search-box">
+        <span>🔎</span>
+        <input id="discoverSearch" type="text" placeholder="${t('searchPh')}" value="${esc(state.filters.q)}">
+      </div>
+      <div class="filter-bar" id="filterBar">
+        ${forms.map(f=>`<button class="chip ${state.filters.artForm===f?'active':''}" data-form="${f}">${f==="all"?"All art forms":ART_FORMS[f]?ART_FORMS[f].name:f}</button>`).join("")}
+      </div>
+      <div class="cat-row-title">${state.filters.q||state.filters.artForm!=="all" ? "Results" : "Featured Performances"}</div>
+      <div class="card-grid">
+        ${list.length ? list.map(perfCard).join("") : `<p class="empty-note">No performances match yet — try a different search or filter.</p>`}
+      </div>
+    </div>
+  </section>`;
+}
+function perfCard(p){
+  const artist = ARTISTS[p.artistId];
+  const saved = state.saved.includes(p.slug);
+  const swatch = ART_FORMS[p.artForm] ? ART_FORMS[p.artForm].swatch : "linear-gradient(155deg,#6E1F23,#1F2A44)";
+  return `<div class="perf-card" onclick="location.hash='#/performance/${encodeURIComponent(p.slug)}'">
+    <div class="perf-thumb" style="background:${swatch}">
+      <span class="form-tag">${ART_FORMS[p.artForm]?ART_FORMS[p.artForm].name:p.artForm}</span>
+      <div class="play">▶</div>
+    </div>
+    <div class="perf-body">
+      <h4>${esc(p.title)}</h4>
+      <div class="perf-meta">${artist?esc(artist.name):"Artist"} · ${esc(p.language)}</div>
+      <div class="perf-stats">
+        <span>👁 ${p.views.toLocaleString()} · ❤️ ${p.likes}</span>
+        <button class="save-toggle ${saved?'saved':''}" onclick="event.stopPropagation(); toggleSave('${p.slug}')">${saved?'🔖':'🏷️'}</button>
+      </div>
+    </div>
+  </div>`;
+}
+function toggleSave(slug){
+  const i = state.saved.indexOf(slug);
+  if(i>-1) state.saved.splice(i,1); else state.saved.push(slug);
+  persist(); route();
+  toast(i>-1 ? "Removed from saved" : "Saved");
+}
+function toggleLike(slug){
+  const p = findPerf(slug); if(!p) return;
+  const i = state.liked.indexOf(slug);
+  if(i>-1){ state.liked.splice(i,1); p.likes--; } else { state.liked.push(slug); p.likes++; }
+  persist(); route();
+  if(sb && dbConnected){
+    sb.from("performances").update({likes:p.likes}).eq("id",slug).then(({error})=>{
+      if(error) console.warn("Supabase like sync failed", error);
+    });
+  }
+}
+function toggleFollow(artistId){
+  const i = state.following.indexOf(artistId);
+  if(i>-1) state.following.splice(i,1); else state.following.push(artistId);
+  persist(); route();
+}
+
+/* ---------- PERFORMANCE DETAIL ---------- */
+function renderPerformanceDetail(slug){
+  const p = findPerf(slug);
+  if(!p) return `<section class="wrap" style="padding:80px 24px;text-align:center"><h2>Performance not found</h2><p><a href="#/discover" class="btn btn-primary" style="margin-top:16px">Back to Discover</a></p></section>`;
+  const artist = ARTISTS[p.artistId] || {name:"Independent Artist", region:p.region};
+  const liked = state.liked.includes(p.slug), saved = state.saved.includes(p.slug), following = state.following.includes(p.artistId);
+  const af = ART_FORMS[p.artForm];
+  const cc = state.ui.ccOn;
+  const capLang = state.ui.ccLang;
+  const currentCaption = cc ? (p.captions[0] ? p.captions[0].text : "") : "";
+  return `
+  <section class="perf-hero wrap">
+    <div class="breadcrumb"><a href="#/discover">Discover</a> / ${esc(p.title)}</div>
+    <div class="video-frame" id="videoFrame" style="background:${af?af.swatch:'linear-gradient(155deg,#1F2A44,#6E1F23)'}">
+      <div class="play-lg" id="playBtn">▶</div>
+      ${cc ? `<div class="cc-caption-text" id="capText">${esc(currentCaption)}</div>`:""}
+      <div class="cc-bar">
+        <span>${esc(p.title)}</span>
+        <div class="cc-controls">
+          <button id="ccToggle">${cc?"CC On":"CC Off"}</button>
+          <select id="ccLangSelect" ${!cc?"disabled":""}>
+            <option value="original" ${capLang==='original'?'selected':''}>Original</option>
+            <option value="en" ${capLang==='en'?'selected':''}>English</option>
+            <option value="hi" ${capLang==='hi'?'selected':''}>Hindi</option>
+            <option value="kn" ${capLang==='kn'?'selected':''}>Kannada</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="perf-title-row">
+      <div>
+        <h1>${esc(p.title)}</h1>
+        <div class="byline">By <a href="#/artist/${p.artistId}">${esc(artist.name)}</a> · ${esc(p.region)}</div>
+        <div class="tag-row"><span class="tag">${af?af.name:p.artForm}</span><span class="tag">${esc(p.language)}</span></div>
+      </div>
+      <div class="action-row">
+        <button class="action-btn ${liked?'liked':''}" onclick="toggleLike('${p.slug}')">❤️ ${p.likes}</button>
+        <button class="action-btn ${saved?'saved':''}" onclick="toggleSave('${p.slug}')">🔖 ${saved?'Saved':'Save'}</button>
+        <button class="action-btn" id="shareBtn">↗ Share</button>
+        <button class="action-btn ${following?'following':''}" onclick="toggleFollow('${p.artistId}')">${following?'Following':'Follow Artist'}</button>
+        <button class="action-btn" id="reportBtn">🚩 Report</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <h2>📖 What's happening?</h2>
+    <p class="body-text" id="storyText">${state.ui.expandedStory || p.story.length<260 ? esc(p.story) : esc(p.story.slice(0,240))+"…"}</p>
+    ${p.story.length>=260 ? `<button class="readmore-btn" id="readMoreBtn">${state.ui.expandedStory?"Show less":"Read more"}</button>`:""}
+  </section>
+
+  <section class="content-section">
+    <h2>👤 Meet the characters</h2>
+    <div class="char-grid">
+      ${p.characters.map(c=>`<div class="char-card"><div class="avatar"></div><h4>${esc(c)}</h4><p>${esc((p.charDesc&&p.charDesc[c]) || "More information about this character has not been provided by the artist yet.")}</p></div>`).join("")}
+    </div>
+  </section>
+
+  <section class="content-section">
+    <h2>🎵 Understand the music</h2>
+    ${p.lyrics && p.lyrics.original ? `
+      <div class="lyrics-tabs">
+        <button class="tab-btn ${state.ui.lyricsTab==='original'?'active':''}" data-tab="original">Original</button>
+        <button class="tab-btn ${state.ui.lyricsTab==='en'?'active':''}" data-tab="en">Translation (English)</button>
+        <button class="tab-btn ${state.ui.lyricsTab==='hi'?'active':''}" data-tab="hi">Translation (Hindi)</button>
+      </div>
+      <div class="lyric-block">${state.ui.lyricsTab==='original' ? esc(p.lyrics.original) : esc(p.lyrics.translations[state.ui.lyricsTab] || "Translation not yet available in this language.")}</div>
+      ${state.ui.lyricsTab!=='original' ? `<div class="meaning-note"><b>Meaning &amp; interpretation</b> (distinct from the literal translation above): ${esc(p.lyrics.meaning)}</div>` : (p.lyrics.meaning?`<div class="meaning-note"><b>Meaning &amp; interpretation:</b> ${esc(p.lyrics.meaning)}</div>`:"")}
+    ` : `<p class="empty-note">Lyrics/transcription are not available for this performance.</p>`}
+  </section>
+
+  <section class="content-section">
+    <h2>🪔 Cultural context</h2>
+    <p class="body-text">${esc(p.culturalNote)}</p>
+    <div style="margin-top:20px">
+      ${expandBox("Art form & region", `${af?af.name:p.artForm} · ${esc(p.region)} · language: ${esc(p.language)}`)}
+      ${af?expandBox("Historical background", af.history):""}
+      ${af?expandBox("Music", af.music):""}
+    </div>
+  </section>
+
+  <section class="content-section">
+    <h2>🎭 Key expressions &amp; gestures</h2>
+    <div class="gesture-list">
+      ${(p.gestures||[]).map(g=>`<div class="gesture-item"><div class="g-title">${esc(g.title)}</div><p>${esc(g.body)}</p></div>`).join("")}
+    </div>
+  </section>
+
+  <div class="learn-more-box">
+    <h2>Want to understand this art form better?</h2>
+    <p>Go deeper into the history, costumes, music and vocabulary of ${af?af.name:p.artForm}.</p>
+    <a href="#/learn/${p.artForm}" class="btn btn-gold">Explore ${af?af.name:p.artForm}</a>
+  </div>
+  `;
+}
+function expandBox(title, body){
+  const id = "eb_"+Math.random().toString(36).slice(2,8);
+  return `<div class="expand-box"><div class="expand-head" data-target="${id}">${esc(title)} <span>▾</span></div><div class="expand-body" id="${id}"><p>${esc(body)}</p></div></div>`;
+}
+
+/* ---------- LEARN ---------- */
+function renderLearn(key){
+  if(!key){
+    return `<section style="padding-top:44px" class="wrap">
+      <div class="section-head"><h2>Explore art forms</h2><p>A deeper layer for anyone who wants to go beyond a single performance.</p></div>
+      <div class="artform-grid">
+        ${Object.entries(ART_FORMS).map(([k,v])=>`<a class="artform-card" href="#/learn/${k}"><div class="swatch" style="background:${v.swatch}"></div><h4>${v.name}</h4><p>${v.region}</p></a>`).join("")}
+      </div>
+    </section>`;
+  }
+  const af = ART_FORMS[key];
+  if(!af) return `<section class="wrap" style="padding:60px 24px"><p>Art form not found. <a href="#/learn">Back to Learn</a></p></section>`;
+  const tabs = [["history","Introduction & History"],["costumes","Costumes"],["music","Music"],["expressions","Expressions"],["mudras","Basic Mudras"],["structure","Performance Structure"],["terminology","Terminology"]];
+  const active = state.ui.learnTab in af || state.ui.learnTab==="history" ? state.ui.learnTab : "history";
+  const related = state.performances.filter(p=>p.artForm===key && p.status==="Published");
+  let panelBody;
+  if(active==="expressions" || active==="mudras" || active==="terminology"){
+    panelBody = `<ul>${af[active].map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+  } else {
+    panelBody = `<p>${esc(af[active])}</p>`;
+  }
+  return `<section style="padding-top:44px" class="wrap">
+    <div class="breadcrumb"><a href="#/learn">Learn</a> / ${af.name}</div>
+    <h1 style="font-size:clamp(26px,3.6vw,38px)">${af.name}</h1>
+    <p style="color:var(--ink-soft);margin-top:6px">${af.region} · ${af.language}</p>
+    <div class="learn-detail-grid" style="margin-top:34px">
+      <div class="learn-nav">
+        ${tabs.map(([k,label])=>`<button class="${active===k?'active':''}" data-learntab="${k}">${label}</button>`).join("")}
+      </div>
+      <div class="learn-panel">
+        <h3>${tabs.find(x=>x[0]===active)[1]}</h3>
+        ${panelBody}
+        ${related.length ? `<h3 style="margin-top:36px">Related performances</h3><div class="card-grid">${related.map(perfCard).join("")}</div>` : ""}
+      </div>
+    </div>
+  </section>`;
+}
+
+/* ---------- ARTIST PROFILE ---------- */
+function renderArtistProfile(id){
+  const artist = ARTISTS[id];
+  if(!artist){
+    return `<section class="wrap" style="padding:70px 24px;text-align:center"><h2>Artist profile</h2><p style="color:var(--ink-soft);margin-top:10px">Sign in as an artist to see your own profile here, or pick an artist from a performance page.</p><a href="#/discover" class="btn btn-primary" style="margin-top:20px;display:inline-block">Browse performances</a></section>`;
+  }
+  const perfs = state.performances.filter(p=>p.artistId===id);
+  const following = state.following.includes(id);
+  const tab = state.ui.artistTab;
+  return `<section class="wrap" style="padding-top:20px">
+    <div class="artist-hero">
+      <div class="artist-avatar"></div>
+      <div style="flex:1;min-width:220px">
+        <h1>${esc(artist.name)}</h1>
+        <div class="tag-row"><span class="tag">${esc(artist.artForm)}</span><span class="tag">${esc(artist.region)}</span></div>
+        <div class="artist-stats">
+          <span><b>${perfs.length}</b> performances</span>
+          <span><b>${artist.followers + (following?1:0)}</b> followers</span>
+          <span><b>${artist.years}</b> yrs experience</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn ${following?'btn-outline':'btn-primary'}" onclick="toggleFollow('${id}')">${following?'Following':'Follow'}</button>
+        <button class="btn btn-ghost" id="shareBtn">Share Artist</button>
+      </div>
+    </div>
+    <div class="artist-tabs">
+      <button class="${tab==='performances'?'active':''}" data-atab="performances">Performances</button>
+      <button class="${tab==='about'?'active':''}" data-atab="about">About</button>
+      <button class="${tab==='events'?'active':''}" data-atab="events">Upcoming Events</button>
+    </div>
+    ${tab==='performances' ? `<div class="card-grid">${perfs.length?perfs.map(perfCard).join(""):'<p class="empty-note">No performances published yet.</p>'}</div>` : ""}
+    ${tab==='about' ? `<p class="body-text" style="max-width:680px">${esc(artist.bio)}</p><p style="margin-top:14px;color:var(--ink-soft);font-size:14px">Languages: ${artist.languages.join(", ")}</p>` : ""}
+    ${tab==='events' ? `<p class="empty-note">No upcoming events listed yet.</p>` : ""}
+  </section>`;
+}
+
+/* ---------- UPLOAD FLOW ---------- */
+function renderUpload(){
+  if(!state.draft) state.draft = {step:1, videoName:null, title:"", artForm:"", characters:"", plot:"", language:"", region:"", lyrics:"", notes:"", status:"Draft"};
+  const d = state.draft;
+  if(d.status==="AIProcessing") return renderAIProcessing();
+  return `<section class="wrap" style="max-width:760px;padding-top:44px">
+    <h1 style="font-size:clamp(26px,3.6vw,36px)">Share your art with the world</h1>
+    <div class="stepper" style="margin-top:28px">
+      <div class="dot ${d.step>=1?'done':''}"></div><div class="dot ${d.step>=2?'done':''}"></div>
+    </div>
+    ${d.step===1 ? uploadStep1(d) : uploadStep2(d)}
+  </section>`;
+}
+function uploadStep1(d){
+  return `<div class="form-card">
+    <h3 style="font-family:'Fraunces',serif;font-size:22px;margin-bottom:6px">Upload performance</h3>
+    <p style="color:var(--ink-soft);font-size:14.5px;margin-bottom:22px">Supports common video formats (MP4, MOV, WebM). This is a prototype — files stay on your device.</p>
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="videoInput" accept="video/*" style="display:none">
+      <div style="font-size:30px;margin-bottom:10px">🎬</div>
+      ${d.videoName ? `<b>${esc(d.videoName)}</b><br><span style="font-size:13px">Ready — continue below</span>` : `<b>Click to choose a video</b><br><span style="font-size:13px">or drag and drop</span>`}
+      ${d.videoName ? `<div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>` : ""}
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:26px">
+      <button class="btn btn-primary" id="toStep2" ${!d.videoName?'disabled style="opacity:.5;cursor:not-allowed"':''}>Continue</button>
+    </div>
+  </div>`;
+}
+function uploadStep2(d){
+  return `<div class="form-card">
+    <h3 style="font-family:'Fraunces',serif;font-size:22px;margin-bottom:20px">Tell us about your performance</h3>
+    <div class="field"><label>Performance title</label><input id="f_title" value="${esc(d.title)}" placeholder="e.g. Krishna vs Kamsa"></div>
+    <div class="field"><label>Art form</label>
+      <select id="f_artform">
+        <option value="">Select art form</option>
+        ${Object.entries(ART_FORMS).map(([k,v])=>`<option value="${k}" ${d.artForm===k?'selected':''}>${v.name}</option>`).join("")}
+        <option value="other" ${d.artForm==="other"?'selected':''}>Other</option>
+      </select>
+    </div>
+    <div class="field"><label>Characters</label><input id="f_characters" value="${esc(d.characters)}" placeholder="e.g. Krishna, Kamsa (comma separated)"></div>
+    <div class="field"><label>Plot / Story</label><textarea id="f_plot" placeholder="Tell us the basic story...">${esc(d.plot)}</textarea>
+      <div class="helper">You don't need to write a long explanation. Tell us the basic story in your own language.</div>
+    </div>
+    <div class="two-col">
+      <div class="field"><label>Language</label><input id="f_language" value="${esc(d.language)}" placeholder="e.g. Kannada"></div>
+      <div class="field"><label>Region</label><input id="f_region" value="${esc(d.region)}" placeholder="e.g. Udupi, Karnataka"></div>
+    </div>
+    <div class="field"><label>Optional lyrics</label><textarea id="f_lyrics" placeholder="Paste lyrics if available...">${esc(d.lyrics)}</textarea></div>
+    <div class="field"><label>Optional cultural notes</label><textarea id="f_notes" placeholder="Anything else audiences should know...">${esc(d.notes)}</textarea></div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px">
+      <button class="btn btn-ghost" id="backStep1">Back</button>
+      <button class="btn btn-primary" id="submitUpload">Generate context with AI</button>
+    </div>
+  </div>`;
+}
+function renderAIProcessing(){
+  setTimeout(()=>{ if(state.draft && state.draft.status==="AIProcessing"){ finishAIGeneration(); route(); } }, 2200);
+  return `<section class="wrap" style="max-width:760px">
+    <div class="ai-loading">
+      <div class="spin-motif"></div>
+      <h2 style="font-size:22px">AI is preparing the context for your performance…</h2>
+      <p style="color:var(--ink-soft);margin-top:10px;max-width:44ch">Drafting a story, character notes, translation and captions from what you provided. You'll review and approve everything next.</p>
+    </div>
+  </section>`;
+}
+function generatePerformanceContext(d){
+  const chars = d.characters.split(",").map(s=>s.trim()).filter(Boolean);
+  const afKey = ART_FORMS[d.artForm] ? d.artForm : null;
+  const af = afKey ? ART_FORMS[afKey] : null;
+  const story = d.plot && d.plot.trim().length
+    ? `${d.plot.trim()}${d.plot.trim().slice(-1)==="."?"":"."} This performance, in the ${af?af.name:(d.artForm||"traditional")} tradition${d.language?` and performed in ${d.language}`:""}, brings this story to the stage through movement, expression and music. ${chars.length?`The performance centres on ${chars.join(" and ")}.`:""}`
+    : "More information is needed from the artist to generate a story summary.";
+  const charDesc = {};
+  chars.forEach(c=>{ charDesc[c] = `A character in this performance. The artist has not yet provided specific details about ${c}'s role — this description will be refined once reviewed.`; });
+  const culturalNote = af
+    ? `This is a ${af.name} performance from ${d.region||af.region}. ${af.history}`
+    : `This performance belongs to the ${d.artForm||"specified"} tradition${d.region?` from ${d.region}`:""}. More cultural background is needed from the artist to expand this section.`;
+  const lyricsBlock = d.lyrics && d.lyrics.trim().length
+    ? { original: d.lyrics.trim(), translations:{ en: "Draft translation pending artist review — AI translation will appear here.", hi: "समीक्षा हेतु प्रारूप अनुवाद लंबित है।" }, meaning: "Draft cultural interpretation pending artist review." }
+    : { original: null, translations:{}, meaning: null };
+  const plotWords = (d.plot||"").split(/\s+/).filter(Boolean);
+  const third = Math.max(1, Math.floor(plotWords.length/3));
+  const captions = plotWords.length ? [
+    {t:0, text:"[Performance begins]"},
+    {t:8, text: plotWords.slice(0, third).join(" ") || "…"},
+    {t:20, text: plotWords.slice(third, third*2).join(" ") || "…"},
+    {t:32, text: plotWords.slice(third*2).join(" ") || "…"}
+  ] : [{t:0, text:"Demo captions will appear here once more detail is provided."}];
+  const gestures = af ? af.expressions.slice(0,1).map(e=>({title:"Expression note", body:`Based on the ${af.name} tradition, expressions such as "${e.split(' — ')[0]}" may appear in this performance — the artist should confirm which are actually used.`})) : [];
+  return {story, charDesc, culturalNote, lyrics:lyricsBlock, captions, gestures, characters:chars, artForm: d.artForm, artFormKnown: !!af};
+}
+function finishAIGeneration(){
+  const d = state.draft;
+  const generated = generatePerformanceContext(d);
+  state.draft.generated = generated;
+  state.draft.status = "NeedsReview";
+  state.draft.approvals = {story:false, characters:false, culturalContext:false, lyrics:false, captions:false};
+}
+function renderReview(){
+  const d = state.draft;
+  if(!d || d.status!=="NeedsReview"){
+    return `<section class="wrap" style="padding:70px 24px;text-align:center"><h2>Nothing to review yet</h2><p style="color:var(--ink-soft);margin-top:10px">Upload a performance first to generate content for review.</p><a href="#/upload" class="btn btn-primary" style="margin-top:20px;display:inline-block">Go to upload</a></section>`;
+  }
+  const g = d.generated;
+  const allApproved = Object.values(d.approvals).every(Boolean);
+  return `<section class="wrap" style="max-width:760px;padding-top:44px">
+    <h1 style="font-size:clamp(24px,3.2vw,32px)">Review AI-generated content</h1>
+    <div class="warn-banner">⚠️ <span>AI-generated content must be reviewed before publishing. Nothing here goes live until you approve it.</span></div>
+
+    ${reviewBlock("story","AI-generated story", `<textarea id="rev_story" style="width:100%;min-height:120px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-family:inherit;font-size:15px">${esc(g.story)}</textarea>`, d.approvals.story)}
+
+    ${reviewBlock("characters","Characters", g.characters.length ? g.characters.map(c=>`<div style="margin-bottom:12px"><b>${esc(c)}</b><textarea data-char="${esc(c)}" class="rev_char" style="width:100%;min-height:60px;margin-top:6px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-family:inherit;font-size:14px">${esc(g.charDesc[c])}</textarea></div>`).join("") : `<p class="empty-note">No characters were listed.</p>`, d.approvals.characters)}
+
+    ${reviewBlock("culturalContext","Cultural context", `<textarea id="rev_cc" style="width:100%;min-height:100px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-family:inherit;font-size:15px">${esc(g.culturalNote)}</textarea>`, d.approvals.culturalContext)}
+
+    ${reviewBlock("lyrics","Lyrics / Translation", g.lyrics.original ? `<textarea id="rev_lyrics" style="width:100%;min-height:80px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-family:inherit;font-size:14.5px">${esc(g.lyrics.original)}</textarea><p class="helper" style="margin-top:8px">Draft translations and meaning notes will be attached once approved.</p>` : `<p class="empty-note">No lyrics were provided — this section will show "not available" to audiences.</p>`, d.approvals.lyrics)}
+
+    ${reviewBlock("captions","Captions", `<div style="font-size:13.5px;color:var(--ink-soft)">${g.captions.map(c=>`<div style="padding:6px 0;border-bottom:1px dashed var(--line)">${c.t}s — ${esc(c.text)}</div>`).join("")}</div>`, d.approvals.captions)}
+
+    <div style="display:flex;justify-content:flex-end;margin-top:10px">
+      <button class="btn btn-primary" id="approvePublish" ${!allApproved?'style="opacity:.5;cursor:not-allowed"':''} ${!allApproved?'disabled':''}>Approve & Publish</button>
+    </div>
+    ${!allApproved?`<p class="helper" style="text-align:right;margin-top:8px">Approve every section above to publish.</p>`:""}
+  </section>`;
+}
+function reviewBlock(key, title, body, approved){
+  return `<div class="review-block">
+    <div class="review-block-head"><h3>${esc(title)}</h3>${approved?`<span class="approved-badge">✓ Approved</span>`:`<button class="btn btn-sm btn-outline" data-approve="${key}">Approve</button>`}</div>
+    ${body}
+  </div>`;
+}
+function approveSection(key){
+  const d = state.draft;
+  if(!d) return;
+  // pull edited values back into generated object before locking
+  const g = d.generated;
+  if(key==="story"){ const el=document.getElementById("rev_story"); if(el) g.story = el.value; }
+  if(key==="characters"){ document.querySelectorAll(".rev_char").forEach(el=>{ g.charDesc[el.dataset.char]=el.value; }); }
+  if(key==="culturalContext"){ const el=document.getElementById("rev_cc"); if(el) g.culturalNote = el.value; }
+  if(key==="lyrics" && g.lyrics.original){ const el=document.getElementById("rev_lyrics"); if(el) g.lyrics.original = el.value; }
+  d.approvals[key] = true;
+  route();
+}
+async function publishDraft(){
+  const d = state.draft, g = d.generated;
+  const artForm = ART_FORMS[d.artForm] ? d.artForm : (d.artForm||"other");
+  let artistId = state.user && state.user.artistId ? state.user.artistId : "you";
+  if(!ARTISTS[artistId]) ARTISTS[artistId] = {name: state.user?state.user.name:"You", artForm: ART_FORMS[artForm]?ART_FORMS[artForm].name:artForm, region:d.region||"—", languages:[d.language||"—"], bio:"New ArtStory artist.", years:0, followers:0};
+  const perf = {
+    slug: slugify(d.title||"performance"),
+    title: d.title || "Untitled performance",
+    artForm, language: d.language||"—", region: d.region||"—",
+    artistId, characters: g.characters, plot: d.plot,
+    story: g.story, culturalNote: g.culturalNote, charDesc: g.charDesc,
+    lyrics: g.lyrics, captions: g.captions, gestures: g.gestures,
+    likes:0, saved:0, views:0, status:"Published"
+  };
+  if(sb && dbConnected){
+    try{
+      const { error } = await sb.from("performances").insert({...perfToRow(perf), created_at:new Date().toISOString()});
+      if(error) throw error;
+    }catch(e){
+      console.warn("Supabase publish failed, saving locally instead.", e);
+      toast("Couldn't reach the database — published to this browser only.");
+    }
+  }
+  state.performances.unshift(perf);
+  state.draft = null;
+  persist();
+  location.hash = "#/performance/"+encodeURIComponent(perf.slug);
+  toast(dbConnected ? "Published to the shared library — visible to everyone." : "Published! The context now travels with your art.");
+}
+
+/* ---------- ABOUT ---------- */
+function renderAbout(){
+  return `<section class="wrap" style="max-width:720px;padding-top:50px">
+    <h1 style="font-size:clamp(28px,3.8vw,40px)">Why ArtStory?</h1>
+    <p class="body-text" style="margin-top:20px">Traditional art carries generations of stories and knowledge. But unfamiliar audiences may struggle to understand the language, symbolism and cultural context behind a performance.</p>
+    <p class="body-text" style="margin-top:14px">ArtStory uses technology to bridge that gap — bringing the story, characters, music and cultural background alongside the performance itself, so audiences don't need to leave the platform to understand what they're watching.</p>
+    <p class="body-text" style="margin-top:14px;font-weight:700;color:var(--ink)">We don't replace artists. We help their art speak to more people.</p>
+    <div class="motif-strip" style="margin:40px 0"></div>
+    <div class="pillars-grid">
+      <div class="pillar"><div class="emoji">🎨</div><h4>Discover</h4><p>Help audiences discover lesser-known artists.</p></div>
+      <div class="pillar"><div class="emoji">🪔</div><h4>Preserve</h4><p>Preserve performances together with their cultural context.</p></div>
+      <div class="pillar"><div class="emoji">🤝</div><h4>Connect</h4><p>Create a path between artists and interested audiences.</p></div>
+      <div class="pillar"><div class="emoji">💻</div><h4>Reimagine</h4><p>A new way to experience traditional art digitally.</p></div>
+    </div>
+  </section>`;
+}
+
+/* ---------- ADMIN ---------- */
+function renderAdmin(){
+  return `<section class="wrap" style="padding-top:44px">
+    <h1 style="font-size:28px">Admin</h1>
+    <p style="color:var(--ink-soft);margin:8px 0 26px">Basic moderation view for the ArtStory prototype.</p>
+    <table class="admin-table">
+      <thead><tr><th>Title</th><th>Artist</th><th>Art form</th><th>Status</th><th>Views</th><th></th></tr></thead>
+      <tbody>
+      ${state.performances.map(p=>`<tr>
+        <td>${esc(p.title)}</td>
+        <td>${esc(ARTISTS[p.artistId]?ARTISTS[p.artistId].name:p.artistId)}</td>
+        <td>${ART_FORMS[p.artForm]?ART_FORMS[p.artForm].name:p.artForm}</td>
+        <td><span class="status-pill ${p.status.replace(/\s/g,'')}">${p.status}</span></td>
+        <td>${p.views.toLocaleString()}</td>
+        <td><button class="btn btn-sm btn-ghost" data-remove="${p.slug}">Remove</button></td>
+      </tr>`).join("")}
+      </tbody>
+    </table>
+  </section>`;
+}
+
+/* ---------- FOOTER / MODALS ---------- */
+function renderFooter(){
+  return `<footer><div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <span class="brand-name">ArtStory</span>
+        <p class="footer-tag">${t("tagline")}</p>
+      </div>
+      <div class="footer-links">
+        <div><h5>Explore</h5><a href="#/discover">Discover</a><a href="#/learn">Learn</a><a href="#/about">About</a></div>
+        <div><h5>Artists</h5><a href="#/upload">Upload Performance</a><a href="#/admin">Admin</a></div>
+      </div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 ArtStory — a hackathon prototype.</span><span>Made for "What is Earth without art? Just a rock."</span></div>
+  </div></footer>`;
+}
+function renderModals(){
+  let m = "";
+  if(state.ui.authModal){
+    m += `<div class="overlay" id="authOverlay">
+      <div class="modal" style="position:relative">
+        <button class="close-x" id="closeAuth">✕</button>
+        <h3>${state.ui.authMode==='login'?'Log in':'Create your account'}</h3>
+        <p class="sub">${state.ui.authMode==='login'?'Welcome back to ArtStory.':'Tell us how you plan to use ArtStory.'}</p>
+        ${state.ui.authMode==='signup' ? `
+        <div class="role-pick">
+          <button data-role="artist" class="${state.ui.authRole==='artist'?'sel':''}">🎭 I'm an Artist</button>
+          <button data-role="audience" class="${state.ui.authRole==='audience'?'sel':''}">🙋 I'm an Audience Member</button>
+        </div>` : ""}
+        <div class="field"><label>Name</label><input id="authName" placeholder="Your name"></div>
+        <div class="field"><label>Email</label><input id="authEmail" placeholder="you@example.com"></div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" id="authSubmit">${state.ui.authMode==='login'?'Log in':'Create account'}</button>
+        <p style="text-align:center;margin-top:16px;font-size:13.5px;color:var(--ink-soft)">
+          ${state.ui.authMode==='login' ? `New here? <a href="#" id="switchToSignup" style="color:var(--maroon);font-weight:700">Sign up</a>` : `Already have an account? <a href="#" id="switchToLogin" style="color:var(--maroon);font-weight:700">Log in</a>`}
+        </p>
+        <p style="text-align:center;margin-top:6px"><a href="#" id="useDemoAccount" style="font-size:12.5px;color:var(--ink-soft)">Use a demo account instead</a></p>
+      </div>
+    </div>`;
+  }
+  if(state.ui.reportModal){
+    m += `<div class="overlay" id="reportOverlay">
+      <div class="modal" style="position:relative">
+        <button class="close-x" id="closeReport">✕</button>
+        <h3>Report this performance</h3>
+        <p class="sub">Cultural information should be treated carefully — thanks for flagging it.</p>
+        <div class="report-reasons">
+          <label><input type="radio" name="reportReason" value="Incorrect information">Incorrect information</label>
+          <label><input type="radio" name="reportReason" value="Copyright concern">Copyright concern</label>
+          <label><input type="radio" name="reportReason" value="Inappropriate content">Inappropriate content</label>
+          <label><input type="radio" name="reportReason" value="Other">Other</label>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:20px" id="submitReport">Submit report</button>
+      </div>
+    </div>`;
+  }
+  return m;
+}
+
+/* ---------- EVENT BINDING ---------- */
+function bindGlobalEvents(){
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+  $("#langSelect")?.addEventListener("change", e=>{ state.lang=e.target.value; persist(); route(); });
+  $("#themeToggle")?.addEventListener("click", ()=>{
+    const prefersDark = (typeof window.matchMedia === "function") && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isDark = document.documentElement.getAttribute("data-theme")==="dark" || (!document.documentElement.hasAttribute("data-theme") && prefersDark);
+    state.theme = isDark ? "light" : "dark";
+    applyTheme(); persist(); route();
+  });
+  $("#hamburgerBtn")?.addEventListener("click", ()=>{ state.ui.mobileMenu=true; route(); });
+  $("#closeMobileMenu")?.addEventListener("click", ()=>{ state.ui.mobileMenu=false; route(); });
+  $$("#mobileMenu a").forEach(a=>a.addEventListener("click",()=>{ state.ui.mobileMenu=false; }));
+  $("#openAuth")?.addEventListener("click", ()=>{ state.ui.authModal=true; state.ui.authMode="login"; route(); });
+  $("#closeAuth")?.addEventListener("click", ()=>{ state.ui.authModal=false; route(); });
+  $("#switchToSignup")?.addEventListener("click", e=>{ e.preventDefault(); state.ui.authMode="signup"; route(); });
+  $("#switchToLogin")?.addEventListener("click", e=>{ e.preventDefault(); state.ui.authMode="login"; route(); });
+  $$("[data-role]").forEach(b=>b.addEventListener("click", ()=>{ state.ui.authRole=b.dataset.role; route(); }));
+  $("#useDemoAccount")?.addEventListener("click", e=>{
+    e.preventDefault();
+    state.user = {name:"Ravindra Shetty", role:"artist", artistId:"ravindra-shetty"};
+    state.ui.authModal=false; persist(); route(); toast("Signed in as a demo artist account");
+  });
+  $("#authSubmit")?.addEventListener("click", ()=>{
+    const name = $("#authName")?.value.trim() || "ArtStory User";
+    if(state.ui.authMode==="signup" && !state.ui.authRole){ toast("Please choose how you'll use ArtStory"); return; }
+    state.user = { name, role: state.ui.authMode==="signup" ? state.ui.authRole : "audience" };
+    state.ui.authModal=false; persist(); route();
+    toast(`Welcome, ${name}!`);
+  });
+
+  $("#discoverSearch")?.addEventListener("input", e=>{ state.filters.q = e.target.value; renderInPlaceDiscoverList(); });
+  $$("#filterBar .chip").forEach(c=>c.addEventListener("click", ()=>{ state.filters.artForm=c.dataset.form; route(); }));
+
+  $("#readMoreBtn")?.addEventListener("click", ()=>{ state.ui.expandedStory = !state.ui.expandedStory; route(); });
+  $$("[data-tab]").forEach(b=>b.addEventListener("click", ()=>{ state.ui.lyricsTab=b.dataset.tab; route(); }));
+  $$(".expand-head").forEach(h=>h.addEventListener("click", ()=>{
+    const body = document.getElementById(h.dataset.target);
+    body.classList.toggle("open");
+  }));
+  $("#ccToggle")?.addEventListener("click", ()=>{ state.ui.ccOn=!state.ui.ccOn; route(); });
+  $("#ccLangSelect")?.addEventListener("change", e=>{ state.ui.ccLang=e.target.value; toast("Caption language set to "+e.target.value); });
+  $("#playBtn")?.addEventListener("click", ()=>{ toast("Demo video player — connect a real video source to play."); });
+  $("#shareBtn")?.addEventListener("click", ()=>{
+    const url = location.href;
+    if(navigator.share){ navigator.share({title:document.title, url}).catch(()=>{}); }
+    else { navigator.clipboard?.writeText(url); toast("Link copied to clipboard"); }
+  });
+  $("#reportBtn")?.addEventListener("click", ()=>{ state.ui.reportModal=true; route(); });
+  $("#closeReport")?.addEventListener("click", ()=>{ state.ui.reportModal=false; route(); });
+  $("#submitReport")?.addEventListener("click", ()=>{ state.ui.reportModal=false; route(); toast("Thanks — our team will review this."); });
+
+  $$("[data-atab]").forEach(b=>b.addEventListener("click", ()=>{ state.ui.artistTab=b.dataset.atab; route(); }));
+  $$("[data-learntab]").forEach(b=>b.addEventListener("click", ()=>{ state.ui.learnTab=b.dataset.learntab; route(); }));
+
+  // upload flow
+  $("#dropzone")?.addEventListener("click", ()=>$("#videoInput").click());
+  $("#videoInput")?.addEventListener("change", e=>{
+    if(e.target.files[0]){ state.draft.videoName = e.target.files[0].name; route(); }
+  });
+  $("#toStep2")?.addEventListener("click", ()=>{ if(state.draft.videoName){ state.draft.step=2; route(); } });
+  $("#backStep1")?.addEventListener("click", ()=>{ state.draft.step=1; route(); });
+  $("#submitUpload")?.addEventListener("click", ()=>{
+    const d = state.draft;
+    d.title = $("#f_title").value.trim();
+    d.artForm = $("#f_artform").value;
+    d.characters = $("#f_characters").value.trim();
+    d.plot = $("#f_plot").value.trim();
+    d.language = $("#f_language").value.trim();
+    d.region = $("#f_region").value.trim();
+    d.lyrics = $("#f_lyrics").value.trim();
+    d.notes = $("#f_notes").value.trim();
+    if(!d.title || !d.plot){ toast("Please add at least a title and a short plot."); return; }
+    d.status = "AIProcessing";
+    route();
+  });
+  $$("[data-approve]").forEach(b=>b.addEventListener("click", ()=>approveSection(b.dataset.approve)));
+  $("#approvePublish")?.addEventListener("click", ()=>{ if(!$("#approvePublish").disabled) publishDraft(); });
+
+  $$("[data-remove]").forEach(b=>b.addEventListener("click", ()=>{
+    const slug = b.dataset.remove;
+    state.performances = state.performances.filter(p=>p.slug!==slug);
+    persist(); route(); toast("Removed");
+    if(sb && dbConnected){
+      sb.from("performances").delete().eq("id",slug).then(({error})=>{ if(error) console.warn("Supabase delete failed", error); });
+    }
+  }));
+}
+function renderInPlaceDiscoverList(){
+  // lightweight re-render of just the grid+heading to keep focus in the search box
+  const wrap = document.querySelector(".cat-row-title")?.parentElement;
+  if(!wrap) return;
+  const grid = document.querySelector(".card-grid");
+  const heading = document.querySelector(".cat-row-title");
+  let list = state.performances.filter(p=>p.status==="Published");
+  if(state.filters.artForm!=="all") list = list.filter(p=>p.artForm===state.filters.artForm);
+  if(state.filters.q) list = list.filter(p => (p.title+p.artForm+p.language+p.characters.join(" ")+(ARTISTS[p.artistId]?.name||"")).toLowerCase().includes(state.filters.q.toLowerCase()));
+  if(heading) heading.textContent = state.filters.q||state.filters.artForm!=="all" ? "Results" : "Featured Performances";
+  if(grid) grid.innerHTML = list.length ? list.map(perfCard).join("") : `<p class="empty-note">No performances match yet — try a different search or filter.</p>`;
+}
+
+/* ---------- init ---------- */
+applyTheme();
+route(); // instant first paint with local/demo data — never block on the network
+loadPerformances().then(()=>{ route(); }); // then swap in live database data if configured
+</script>
+</body>
+</html>
